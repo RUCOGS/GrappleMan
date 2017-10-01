@@ -9,6 +9,7 @@ public class ControllableBox : MonoBehaviour {
     public LayerMask collisionMask;
     public int raycastsPerDirection; // >=3
     public float raycastLookahead;
+    public float collisionDistance;
     public float skinWidth;
 
     // Components
@@ -32,16 +33,7 @@ public class ControllableBox : MonoBehaviour {
         velocity = new Vector2(0, 0);
     }
 
-    void ResetCollisions() {
-        lastHitAbove = null;
-        lastHitBelow = null;
-        lastHitLeft = null;
-        lastHitRight = null;
-    }
-
     public void CalculateCollisions() {
-        ResetCollisions();
-
         CalculateVerticalCollisions();
         CalculateHorizontalCollisions();
     }
@@ -65,7 +57,11 @@ public class ControllableBox : MonoBehaviour {
     }
 
     public bool IsOnGround() {
-        return lastHitBelow != null;
+        return lastHitBelow != null && lastHitBelow.Value.distance < collider.bounds.size.y/2 + collisionDistance;
+    }
+
+    public Vector2 GetVelocity() {
+        return velocity;
     }
 
     void CalculateVerticalCollisions() {
@@ -98,64 +94,82 @@ public class ControllableBox : MonoBehaviour {
             origin.x += sep;
         }
 
-        if ( shortestHitDirection > 0 ) {
+        if (shortestHitDirection > 0) {
             lastHitAbove = shortestHit;
+            lastHitBelow = null;
         } else if (shortestHitDirection < 0) {
+            lastHitAbove = null;
             lastHitBelow = shortestHit;
+        } else {
+            lastHitAbove = null;
+            lastHitBelow = null;
         }
     }
 
     void CalculateHorizontalCollisions() {
-        if (velocity.x == 0) return;
-
         float sep = (collider.bounds.size.y - 2*skinWidth) / (float) (raycastsPerDirection - 1);
         Vector2 origin = new Vector2(collider.bounds.center.x, collider.bounds.min.y + skinWidth);
 
         float distance = collider.bounds.size.x / 2 + raycastLookahead;
+
         RaycastHit2D? shortestHit = null;
+        int shortestHitDirection = 0;
 
         for (int i=0;i<raycastsPerDirection;i++) {
             RaycastHit2D hit;
 
-            hit = Physics2D.Raycast(origin, Mathf.Sign(velocity.x)* Vector2.right, distance, collisionMask);
-
+            hit = Physics2D.Raycast(origin, Vector2.right, distance, collisionMask);
             if (hit && hit.distance < distance) {
                 shortestHit = hit;
+                shortestHitDirection = 1;
+                distance = hit.distance;
+            }
+
+            hit = Physics2D.Raycast(origin, Vector2.left, distance, collisionMask);
+            if (hit && hit.distance < distance) {
+                shortestHit = hit;
+                shortestHitDirection = -1;
                 distance = hit.distance;
             }
 
             origin.y += sep;
         }
 
-        if (velocity.x > 0) {
+        if (shortestHitDirection > 0) {
             lastHitRight = shortestHit;
-        } else {
+            lastHitLeft = null;
+        } else if (shortestHitDirection < 0) {
+            lastHitRight = null;
             lastHitLeft = shortestHit;
+        } else {
+            lastHitRight = null;
+            lastHitLeft = null;
         }
-
-        origin.y += sep;
     }
 
     public void runPhysics() {
-        Debug.Log( (lastHitAbove==null?"":"Above,") + (lastHitBelow==null?"":"Below,") + (lastHitLeft==null?"":"Left,") + (lastHitRight==null?"":"Right") );
+        Vector2 nextTransform = velocity + acceleration + movement;
 
-        if (lastHitAbove != null) {
+        if (lastHitRight != null && nextTransform.x > lastHitRight.Value.distance - collider.bounds.size.x / 2 - collisionDistance) {
+            float distanceFromEdge = lastHitRight.Value.distance - collider.bounds.size.x / 2;
+
+            if (acceleration.x + velocity.x > 0)
+                acceleration.x = -velocity.x;
+
+            movement.x = distanceFromEdge;
+        } else if (lastHitLeft != null && nextTransform.x < collider.bounds.size.x / 2 - lastHitLeft.Value.distance + collisionDistance) {
+            if (acceleration.x + velocity.x < 0)
+                acceleration.x = -velocity.x;
+            movement.x = collider.bounds.size.x / 2 - lastHitLeft.Value.distance;
+        }
+
+        if (lastHitAbove != null && nextTransform.y > lastHitAbove.Value.distance - collider.bounds.size.y / 2 - collisionDistance) {
             acceleration.y = -velocity.y;
             movement.y = lastHitAbove.Value.distance - collider.bounds.size.y / 2;
-        } else if (lastHitBelow != null) {
+        } else if (lastHitBelow != null && nextTransform.y < collider.bounds.size.y / 2 - lastHitBelow.Value.distance + collisionDistance) {
             if (acceleration.y + velocity.y < 0)
                 acceleration.y = -velocity.y;
             movement.y = collider.bounds.size.y / 2 - lastHitBelow.Value.distance;
-        }
-
-        if (lastHitRight != null) {
-            if (acceleration.x + velocity.x > 0 || true)
-                acceleration.x = -velocity.x;
-            movement.x = lastHitRight.Value.distance - collider.bounds.size.x / 2;
-        } else if (lastHitLeft != null) {
-            if (acceleration.x + velocity.x < 0 || true)
-                acceleration.x = -velocity.x;
-            movement.x = collider.bounds.size.x / 2 - lastHitLeft.Value.distance + skinWidth;
         }
 
         velocity += acceleration;
