@@ -2,88 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent (typeof (BoxCollider2D))]
+[RequireComponent (typeof (ControllableBox))]
 public class Player : MonoBehaviour {
 
-    public LayerMask collisionMask;
-
     public float gravity;
-    public float friction;
     public float jumpVelocity;
-    public float accelerationAir;
-    public float accelerationGround;
-    public float wallBounciness;
-    public float floorBounciness;
+    public float groundSpeed;
+    public float airSpeed;
 
-    Vector2 velocity;
-    new BoxCollider2D collider;
+    ControllableBox physics;
 
-	void Start () {
-        velocity = new Vector2(0, 0);
-        collider = GetComponent<BoxCollider2D>();
-	}
-	
-	void Update () {
-        Vector2 center = collider.bounds.center;
+    void Start() {
+        physics = GetComponent<ControllableBox>();
+    }
 
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+    void FixedUpdate() {
+        float sideMovement = Input.GetAxisRaw("Horizontal");
+        bool attemptJump = Input.GetKeyDown(KeyCode.Space);
 
-        Vector2 acceleration = new Vector2(0, gravity);
-        Vector2 frameVel = new Vector2(0, 0);
+        physics.CalculateCollisions();
 
-        float height = collider.bounds.max.y - collider.bounds.min.y;
-        float width = collider.bounds.max.x - collider.bounds.min.x;
-
-        // Calculate Collisions
-        RaycastHit2D hitBelow = Physics2D.Raycast(center, Vector2.down, height / 2, collisionMask);
-        if (hitBelow)
-        {
-            frameVel.y += (height/2) - hitBelow.distance;
-            acceleration.y = -velocity.y;
-
-            if ( velocity.y < -0.1f)
-            {
-                acceleration.y -= velocity.y*floorBounciness;
+        physics.Accel(new Vector2(0, gravity));
+        if (physics.IsOnGround()) {
+            physics.Accel(groundSpeed*sideMovement, 0);
+            if (attemptJump) {
+                physics.Accel(new Vector2(0, jumpVelocity));
             }
-
-            if (friction > Mathf.Abs(velocity.x))
-            {
-                velocity.x = 0;
-            } else
-            {
-                velocity.x -= Mathf.Sign(velocity.x) * friction;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                acceleration.y += jumpVelocity;
-            }
-
-            acceleration.x += accelerationGround * input.x;
-        } else
-        {
-            acceleration.x += accelerationAir * input.x;
+        } else {
+            physics.Accel(airSpeed*sideMovement, 0);
         }
 
-        if (velocity.x > 0)
-        {
-            RaycastHit2D hitRight = Physics2D.Raycast(center, Vector2.right, width / 2, collisionMask);
-            if (hitRight)
-            {
-                frameVel.x += hitRight.distance - (width / 2);
-                acceleration.x = -velocity.x * (1 + wallBounciness);
-            }
-        } else if (velocity.x < 0)
-        {
-            RaycastHit2D hitLeft = Physics2D.Raycast(center, Vector2.left, width / 2, collisionMask);
-            if (hitLeft)
-            {
-                frameVel.x += (width / 2) - hitLeft.distance;
-                acceleration.x = -velocity.x * (1 + wallBounciness);
-            }
-        }
-
-        velocity += acceleration;
-        transform.Translate(velocity + frameVel);
-	}
+        physics.runPhysics();
+    }
 }
