@@ -32,9 +32,9 @@ public class Player : MonoBehaviour {
         physics.Accel(new Vector2(0, gravity));
         if (physics.IsOnGround()) {
             physics.Accel(groundSpeed * sideMovement, 0);
+            doubleJump = true;
             if (attemptJump) {
                 physics.Accel(new Vector2(0, jumpVelocity));
-                doubleJump = true;
             }
             physics.Accel(new Vector2(vel.x*groundFriction,0));
         } else {
