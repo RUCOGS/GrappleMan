@@ -60,6 +60,16 @@ public class ControllableBox : MonoBehaviour {
         return lastHitBelow != null && lastHitBelow.Value.distance < collider.bounds.size.y/2 + collisionDistance;
     }
 
+    public bool IsOnLeftWall()
+	{
+		return lastHitLeft != null && lastHitLeft.Value.distance < collider.bounds.size.x / 2 + collisionDistance;
+	}
+
+    public bool IsOnRightWall()
+    {
+        return lastHitRight != null && lastHitRight.Value.distance < collider.bounds.size.x / 2 + collisionDistance;
+    }
+
     public Vector2 GetVelocity() {
         return velocity;
     }

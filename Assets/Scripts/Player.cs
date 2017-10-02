@@ -11,6 +11,8 @@ public class Player : MonoBehaviour {
     public float groundSpeed;
     public float airSpeed;
     public float groundFriction;
+    public float wallJumpVelocity;
+    public float wallJumpAngleFromVertical;
 
     ControllableBox physics;
 
@@ -37,7 +39,11 @@ public class Player : MonoBehaviour {
                 physics.Accel(new Vector2(0, jumpVelocity));
             }
             physics.Accel(new Vector2(vel.x*groundFriction,0));
-        } else {
+        } else if (physics.IsOnLeftWall() && attemptJump && !pressJumpLast) {
+                physics.Accel(new Vector2(wallJumpVelocity * Mathf.Sin(Mathf.PI * wallJumpAngleFromVertical / 180), wallJumpVelocity * Mathf.Cos(Mathf.PI * wallJumpAngleFromVertical / 180)));
+		} else if (physics.IsOnRightWall() && attemptJump && !pressJumpLast) {
+                physics.Accel(new Vector2(-1 * wallJumpVelocity * Mathf.Sin(Mathf.PI * wallJumpAngleFromVertical / 180), wallJumpVelocity * Mathf.Cos(Mathf.PI * wallJumpAngleFromVertical / 180)));
+		} else {
             physics.Accel(airSpeed * sideMovement, 0);
             if (doubleJump && attemptJump && !pressJumpLast) {
                 physics.Accel(new Vector2(0, doubleJumpVelocity));
