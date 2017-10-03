@@ -34,6 +34,11 @@ public class Player : MonoBehaviour {
         float height = collider.bounds.max.y - collider.bounds.min.y;
         float width = collider.bounds.max.x - collider.bounds.min.x;
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            acceleration.y += jumpVelocity;
+        }
+
         // Calculate Collisions
         RaycastHit2D hitBelow = Physics2D.Raycast(center, Vector2.down, height / 2, collisionMask);
         if (hitBelow)
@@ -54,10 +59,7 @@ public class Player : MonoBehaviour {
                 velocity.x -= Mathf.Sign(velocity.x) * friction;
             }
 
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                acceleration.y += jumpVelocity;
-            }
+            
 
             acceleration.x += accelerationGround * input.x;
         } else
