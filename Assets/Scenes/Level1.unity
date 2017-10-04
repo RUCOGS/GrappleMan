@@ -275,6 +275,48 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9d9f52363d472734c9abf254ad1fe8f4, type: 2}
   m_IsPrefabParent: 0
+--- !u!1001 &185800236
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -5.81
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 3.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4446561473419298, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: fa5cdc2a19a2643bc98e7901812bae12, type: 2}
+  m_IsPrefabParent: 0
 --- !u!4 &257995965 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4661880651001532, guid: 9d9f52363d472734c9abf254ad1fe8f4,
@@ -583,7 +625,7 @@ GameObject:
   - component: {fileID: 865316151}
   - component: {fileID: 865316155}
   - component: {fileID: 865316154}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
