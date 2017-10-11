@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 [RequireComponent (typeof (BoxCollider2D))]
 public class ControllableBox : MonoBehaviour {
@@ -60,6 +61,10 @@ public class ControllableBox : MonoBehaviour {
         return lastHitBelow != null && lastHitBelow.Value.distance < collider.bounds.size.y/2 + collisionDistance;
     }
 
+    public bool IsOnCeiling() {
+        return lastHitAbove != null && lastHitAbove.Value.distance < collider.bounds.size.y/2 + collisionDistance;
+    }
+
     public bool IsOnLeftWall()
 	{
 		return lastHitLeft != null && lastHitLeft.Value.distance < collider.bounds.size.x / 2 + collisionDistance;
@@ -68,6 +73,25 @@ public class ControllableBox : MonoBehaviour {
     public bool IsOnRightWall()
     {
         return lastHitRight != null && lastHitRight.Value.distance < collider.bounds.size.x / 2 + collisionDistance;
+    }
+
+    public Obstacle[] GetCollisionObjects() {
+        int collisions = 0;
+        Obstacle[] obs = new Obstacle[2];
+        if (IsOnGround()) {
+            obs[collisions++] = lastHitBelow.Value.collider.GetComponent<Obstacle>();
+        } else if (IsOnCeiling()) {
+            obs[collisions++] = lastHitAbove.Value.collider.GetComponent<Obstacle>();
+        }
+        if (IsOnLeftWall()) {
+            obs[collisions++] = lastHitLeft.Value.collider.GetComponent<Obstacle>();
+        } else if (IsOnRightWall()) {
+            obs[collisions++] = lastHitRight.Value.collider.GetComponent<Obstacle>();
+        }
+
+        Obstacle[] ret = new Obstacle[collisions];
+        for (int i = 0; i < collisions; i++) ret[i] = obs[i];
+        return ret;
     }
 
     public Vector2 GetVelocity() {

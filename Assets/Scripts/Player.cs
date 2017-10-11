@@ -19,8 +19,11 @@ public class Player : MonoBehaviour {
     bool doubleJump = false;
     bool pressJumpLast = false;
 
+    Vector2 startPosition;
+
     void Start() {
         physics = GetComponent<ControllableBox>();
+        startPosition = new Vector2(transform.position.x, transform.position.y);
     }
 
     void FixedUpdate() {
@@ -30,6 +33,18 @@ public class Player : MonoBehaviour {
         Vector2 vel = physics.GetVelocity();
 
         physics.CalculateCollisions();
+
+        Obstacle[] collisions = physics.GetCollisionObjects();
+        for (int i=0;i<collisions.Length;i++) {
+            if (collisions[i].dieOnCollision) {
+                physics.Accel(-physics.GetVelocity());
+                physics.Move(startPosition - new Vector2(transform.position.x, transform.position.y));
+                physics.runPhysics();
+                return;
+            } else if (collisions[i].winOnCollision) {
+                UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Win");
+            }
+        }
 
         physics.Accel(new Vector2(0, gravity));
         if (physics.IsOnGround()) {
