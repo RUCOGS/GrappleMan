@@ -18,6 +18,7 @@ public class Player : MonoBehaviour {
     public LayerMask collisionMask;
 
     ControllableBox physics;
+    LineRenderer rope;
 
     bool doubleJump = false;
     bool pressJumpLast = false;
@@ -28,6 +29,7 @@ public class Player : MonoBehaviour {
 
     void Start() {
         physics = GetComponent<ControllableBox>();
+        rope = GetComponentInChildren<LineRenderer>(true);
         startPosition = new Vector2(transform.position.x, transform.position.y);
     }
 
@@ -39,6 +41,9 @@ public class Player : MonoBehaviour {
                 RaycastHit2D raycastHit = Physics2D.Raycast(playerPosition, mousePosition - playerPosition, ropeDistance, collisionMask);
                 if (raycastHit) {
                     ropeDirection = raycastHit.point - playerPosition;
+                    rope.SetPosition(0, Vector2.zero);
+                    rope.SetPosition(1, raycastHit.point - playerPosition);
+                    rope.enabled = true;
                     grapple = true;
                 }
             }
@@ -87,6 +92,7 @@ public class Player : MonoBehaviour {
 
         if (grapple) {
             grapple = false;
+            rope.enabled = false;
             ropeDirection.Normalize();
             physics.Accel(ropeDirection * ropeSpeed);
         }
