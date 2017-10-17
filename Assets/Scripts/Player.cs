@@ -22,7 +22,8 @@ public class Player : MonoBehaviour {
 
     bool doubleJump = false;
     bool pressJumpLast = false;
-    bool grapple = false;
+    bool ropePull = false;
+    bool ropeGrapple = false;
 
     Vector2 startPosition;
     Vector2 ropeDirection;
@@ -34,7 +35,7 @@ public class Player : MonoBehaviour {
     }
 
     void Update() {
-        if(!grapple) {
+        if(!ropePull) {
             if (Input.GetMouseButtonDown(0)) {
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector2 playerPosition = transform.position;
@@ -44,7 +45,22 @@ public class Player : MonoBehaviour {
                     rope.SetPosition(0, Vector2.zero);
                     rope.SetPosition(1, raycastHit.point - playerPosition);
                     rope.enabled = true;
-                    grapple = true;
+                    ropePull = true;
+                }
+            }
+        }
+
+        if(!ropeGrapple) {
+            if(Input.GetMouseButtonDown(1)) {
+                Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector2 playerPosition = transform.position;
+                RaycastHit2D raycastHit = Physics2D.Raycast(playerPosition, mousePosition - playerPosition, ropeDistance, collisionMask);
+                if (raycastHit) {
+                    ropeDirection = raycastHit.point - playerPosition;
+                    rope.SetPosition(0, Vector2.zero);
+                    rope.SetPosition(1, raycastHit.point - playerPosition);
+                    rope.enabled = true;
+                    ropeGrapple = true;
                 }
             }
         }
@@ -90,8 +106,8 @@ public class Player : MonoBehaviour {
             }
         }
 
-        if (grapple) {
-            grapple = false;
+        if (ropePull) {
+            ropePull = false;
             rope.enabled = false;
             ropeDirection.Normalize();
             physics.Accel(ropeDirection * ropeSpeed);
