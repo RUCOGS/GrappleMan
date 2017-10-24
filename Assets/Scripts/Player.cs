@@ -14,7 +14,7 @@ public class Player : MonoBehaviour {
     public float wallJumpVelocity;
     public float wallJumpAngleFromVertical;
     public float ropeDistance;
-    public float ropeSpeed;
+    public float ropePullSpeed;
     public LayerMask collisionMask;
 
     ControllableBox physics;
@@ -86,31 +86,40 @@ public class Player : MonoBehaviour {
             }
         }
 
-        physics.Accel(new Vector2(0, gravity));
-        if (physics.IsOnGround()) {
-            physics.Accel(groundSpeed * sideMovement, 0);
-            doubleJump = true;
-            if (attemptJump) {
-                physics.Accel(new Vector2(0, jumpVelocity));
+        if (!ropeGrapple) {
+            physics.Accel(new Vector2(0, gravity));
+            if (physics.IsOnGround()) {
+                physics.Accel(groundSpeed * sideMovement, 0);
+                doubleJump = true;
+                if (attemptJump) {
+                    physics.Accel(new Vector2(0, jumpVelocity));
+                }
+                physics.Accel(new Vector2(vel.x * groundFriction, 0));
             }
-            physics.Accel(new Vector2(vel.x*groundFriction,0));
-        } else if (physics.IsOnLeftWall() && attemptJump && !pressJumpLast) {
+            else if (physics.IsOnLeftWall() && attemptJump && !pressJumpLast) {
                 physics.Accel(new Vector2(wallJumpVelocity * Mathf.Sin(Mathf.PI * wallJumpAngleFromVertical / 180), wallJumpVelocity * Mathf.Cos(Mathf.PI * wallJumpAngleFromVertical / 180)));
-		} else if (physics.IsOnRightWall() && attemptJump && !pressJumpLast) {
-                physics.Accel(new Vector2(-1 * wallJumpVelocity * Mathf.Sin(Mathf.PI * wallJumpAngleFromVertical / 180), wallJumpVelocity * Mathf.Cos(Mathf.PI * wallJumpAngleFromVertical / 180)));
-		} else {
-            physics.Accel(airSpeed * sideMovement, 0);
-            if (doubleJump && attemptJump && !pressJumpLast) {
-                physics.Accel(new Vector2(0, doubleJumpVelocity));
-                doubleJump = false;
             }
-        }
+            else if (physics.IsOnRightWall() && attemptJump && !pressJumpLast) {
+                physics.Accel(new Vector2(-1 * wallJumpVelocity * Mathf.Sin(Mathf.PI * wallJumpAngleFromVertical / 180), wallJumpVelocity * Mathf.Cos(Mathf.PI * wallJumpAngleFromVertical / 180)));
+            }
+            else if (!ropeGrapple) {
+                physics.Accel(airSpeed * sideMovement, 0);
+                if (doubleJump && attemptJump && !pressJumpLast) {
+                    physics.Accel(new Vector2(0, doubleJumpVelocity));
+                    doubleJump = false;
+                }
+            }
 
-        if (ropePull) {
-            ropePull = false;
-            rope.enabled = false;
+            if (ropePull) {
+                ropeDirection.Normalize();
+                physics.Accel(ropeDirection * ropePullSpeed);
+                ropePull = false;
+                rope.enabled = false;
+            }
+        } else if(ropeGrapple) {
             ropeDirection.Normalize();
-            physics.Accel(ropeDirection * ropeSpeed);
+            physics.Accel(-physics.GetVelocity());
+            //physics.Accel(ropeDirection * sideMovement);
         }
 
         pressJumpLast = attemptJump;
