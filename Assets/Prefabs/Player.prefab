@@ -98,7 +98,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1845365729957610}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.7549, y: -2.5366, z: 0}
+  m_LocalPosition: {x: 5.7549, y: -1.57, z: 0}
   m_LocalScale: {x: 0.7294907, y: 0.9381716, z: 1}
   m_Children:
   - {fileID: 4044891715759454}
@@ -202,7 +202,7 @@ Animator:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1621174994765460}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 17b0bb9824e44314bb05cf7b8825850e, type: 2}
   m_CullingMode: 0
@@ -242,16 +242,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: -0.01
-  jumpVelocity: 0.2
-  doubleJumpVelocity: 0.2
-  groundSpeed: 0.01
-  airSpeed: 0.01
   groundFriction: -0.01
-  wallJumpVelocity: 0.2
-  wallJumpAngleFromVertical: 30
-  ropeDistance: 10
-  ropeSpeed: 0.4
-  collisionMask:
+  ropeDistance: 1000
+  ropePullSpeed: 0.7
+  ropeSwingSpeed: 0.01
+  ropeCollisionMask:
     serializedVersion: 2
     m_Bits: 256
 --- !u!120 &120765014414019184
