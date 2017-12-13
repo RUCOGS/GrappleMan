@@ -33,14 +33,16 @@ public class Player : MonoBehaviour {
     void Update() {
         if(!ropePull) {
             if (Input.GetMouseButtonDown(0)) {
+                float width = transform.GetComponent<Collider2D>().bounds.size.x;
+                float height = transform.GetComponent<Collider2D>().bounds.size.y;
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector2 playerPosition = transform.position;
+                playerPosition += new Vector2(width / 2, height / 2);
                 RaycastHit2D raycastHit = Physics2D.Raycast(playerPosition, mousePosition - playerPosition, Mathf.Infinity, ropeCollisionMask);
                 if (raycastHit) {
                     ropeDirection = raycastHit.point - playerPosition;
-                    rope.SetPosition(0, Vector2.zero);
-                    float width = transform.GetComponent<Collider2D>().bounds.size.x;
-                    float height = transform.GetComponent<Collider2D>().bounds.size.y;
+                    
+                    rope.SetPosition(0, new Vector2(width / 2, height / 2));
                     rope.SetPosition(1, ropeDirection + new Vector2(width/2, height/2));
                     rope.enabled = true;
                     ropePull = true;
@@ -71,17 +73,17 @@ public class Player : MonoBehaviour {
 
         physics.CalculateCollisions();
 
-        Obstacle[] collisions = physics.GetCollisionObjects();
-        for (int i=0;i<collisions.Length;i++) {
-            if (collisions[i].dieOnCollision) {
-                physics.Accel(-physics.GetVelocity());
-                physics.Move(startPosition - new Vector2(transform.position.x, transform.position.y));
-                physics.runPhysics();
-                return;
-            } else if (collisions[i].winOnCollision) {
-                UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Win");
-            }
-        }
+        //Obstacle[] collisions = physics.GetCollisionObjects();
+        //for (int i=0;i<collisions.Length;i++) {
+        //    if (collisions[i].dieOnCollision) {
+        //        physics.Accel(-physics.GetVelocity());
+        //        physics.Move(startPosition - new Vector2(transform.position.x, transform.position.y));
+        //        physics.runPhysics();
+        //        return;
+        //    } else if (collisions[i].winOnCollision) {
+        //        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Win");
+        //    }
+        //}
 
         if(!ropeGrapple) {
             physics.Accel(0, gravity);
@@ -122,6 +124,11 @@ public class Player : MonoBehaviour {
         //        physics.Accel(swingPlayer);
         //    }
         //}
+
+        Vector2 tv = physics.GetVelocity();
+        if(tv.magnitude > 2) {
+            physics.Accel(tv.normalized * 2f - tv);
+        }
 
         physics.runPhysics();
     }
